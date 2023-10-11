@@ -1,0 +1,52 @@
+name: "Terraform Workflow"
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  pr:
+    permissions:
+      contents: read
+      id-token: write
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - id: gcp-auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT }}
+          access_token_lifetime: 3600s
+
+      - id: gcp-sdk
+        name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          install_components: alpha
+
+      - id: tf-setup
+        name: Terraform init
+        continue-on-error: true
+        run: |
+          terraform init -no-color
+
+      - id: tf-validate
+        name: Terraform validate
+        continue-on-error: true
+        run: terraform validate -no-color
+
+      - id: tf-plan
+        name: Terraform plan
+        continue-on-error: true
+        run: |
+          terraform plan -input=false -out ../plan.out -no-color
