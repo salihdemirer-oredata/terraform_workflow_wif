@@ -50,3 +50,54 @@ jobs:
         continue-on-error: true
         run: |
           terraform plan -input=false -out ../plan.out -no-color
+
+      - id: tf-apply
+        name: Terraform apply
+        continue-on-error: true
+        run: |
+          terraform apply -input=false -auto-approve -no-color ../plan.out
+
+      - id: pr-short-comment
+        name: Post comment to Pull Request
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request' && steps.pr-comment.outcome != 'success'
+        with:
+          script: |
+            const output = `### Terraform Initialization \`$${{ steps.tf-init.outcome }}\`
+
+            ### Terraform Validation \`$${{ steps.tf-validate.outcome }}\`
+
+            ### Terraform Plan \`$${{ steps.tf-plan.outcome }}\`
+
+            Plan output is in the action log.
+
+            ### Terraform Apply \`$${{ steps.tf-apply.outcome }}\`
+
+            *Pusher: @$${{ github.actor }}, Action: \`$${{ github.event_name }}\`, Working Directory: \`$${{ env.tf_actions_working_dir }}\`, Workflow: \`$${{ github.workflow }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - id: check-init
+        name: Check init failure
+        if: steps.tf-init.outcome != 'success'
+        run: exit 1
+
+      - id: check-validate
+        name: Check validate failure
+        if: steps.tf-validate.outcome != 'success'
+        run: exit 1
+
+      - id: check-plan
+        name: Check plan failure
+        if: steps.tf-plan.outcome != 'success'
+        run: exit 1
+
+      - id: check-apply
+        name: Check apply failure
+        if: github.event.pull_request.merged == true && steps.tf-apply.outcome != 'success'
+        run: exit 1
