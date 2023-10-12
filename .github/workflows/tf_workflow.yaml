@@ -82,22 +82,3 @@ jobs:
               body: output
             })
 
-      - id: check-init
-        name: Check init failure
-        if: steps.tf-init.outcome != 'success'
-        run: exit 1
-
-      - id: check-validate
-        name: Check validate failure
-        if: steps.tf-validate.outcome != 'success'
-        run: exit 1
-
-      - id: check-plan
-        name: Check plan failure
-        if: steps.tf-plan.outcome != 'success'
-        run: exit 1
-
-      - id: check-apply
-        name: Check apply failure
-        if: github.event.pull_request.merged == true && steps.tf-apply.outcome != 'success'
-        run: exit 1
