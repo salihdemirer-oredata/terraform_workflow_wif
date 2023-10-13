@@ -56,14 +56,14 @@ jobs:
         name: Terraform plan
         continue-on-error: true
         run: |
-          terraform plan -input=false -out ../plan.out -no-color
+          terraform plan -input=false -no-color
 
       - id: tf-apply
         if: github.event.pull_request.merged == true && success()
         name: Terraform apply
         continue-on-error: true
         run: |
-          terraform apply -input=false -auto-approve -no-color ../plan.out
+          terraform apply -input=false -auto-approve -no-color
 
       - id: pr-comment
         name: Post comment to Pull Request
