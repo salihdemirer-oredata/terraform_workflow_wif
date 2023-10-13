@@ -36,6 +36,12 @@ jobs:
           install_components: alpha
 
       - id: tf-setup
+        name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: ${{ vars.TF_VERSION }}
+
+      - id: tf-init
         name: Terraform init
         continue-on-error: true
         run: |
@@ -127,4 +133,3 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
-

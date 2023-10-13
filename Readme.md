@@ -13,4 +13,6 @@ Two GitHub Environment variables are utilized in the workflow. Before triggering
 
 - **SERVICE_ACCOUNT**: Service account email address
 
+- **TF_VERSION**: Terraform version
+
 The Terraform apply command will be executed only when the pull request is merged.
