@@ -65,11 +65,17 @@ jobs:
       #     terraform plan -input=false -out ../plan.out -no-color
 
       - id: tf-apply
-        if: github.event.pull_request.merged == true && success() && /bin/bash -c "echo $? == 0"
+        if: github.event.pull_request.merged == true && success()
         name: Terraform apply
         continue-on-error: true
         run: |
-          terraform apply -input=false -auto-approve -no-color
+          if [[ $? == 0 ]];
+          then
+            terraform apply -input=false -auto-approve -no-color
+          else
+            exit 1
+          fi
+
 
       - id: pr-comment
         name: Post comment to Pull Request
