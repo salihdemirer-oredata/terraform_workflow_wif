@@ -69,13 +69,8 @@ jobs:
         name: Terraform apply
         continue-on-error: true
         run: |
-          echo $?
-          if [[ $? == 0 ]];
-          then
             terraform apply -input=false -auto-approve -no-color
-          else
-            exit 1
-          fi
+
 
 
       - id: pr-comment
