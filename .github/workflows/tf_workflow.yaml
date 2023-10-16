@@ -65,7 +65,7 @@ jobs:
       #     terraform plan -input=false -out ../plan.out -no-color
 
       - id: tf-apply
-        if: github.event.pull_request.merged == true && success() && echo $? == 0 
+        if: github.event.pull_request.merged == true && success() && /bin/bash -c "echo $? == 0"
         name: Terraform apply
         continue-on-error: true
         run: |
